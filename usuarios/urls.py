@@ -11,4 +11,5 @@ urlpatterns = [
     path('dashboard', views.dashboard, name='dashboard'),
     path('logout', views.logout, name='logout'),
     path('cria_receita', views.cria_receita, name='cria_receita'),
+    path('deleta_receita/<int:receita_id>', views.deleta_receita, name='deleta_receita'),
 ]

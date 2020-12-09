@@ -141,6 +141,12 @@ def deleta_receita(request, receita_id):
     return redirect('dashboard')
 
 
+def edita_receita(request, receita_id):
+    objeto_receita = get_object_or_404(Receita, pk=receita_id)
+    receita = { 'receita': objeto_receita }
+    return render(request, 'usuarios/edita_receita.html', receita)
+
+
 def campo_vazio(campo):
     return not campo.strip()
 

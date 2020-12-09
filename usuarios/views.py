@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib import auth
+from django.contrib import auth, messages
 from receitas.models import Receita
 
 
 def cadastro(request):
-    volta_para_cadastro = render(request, 'usuarios/cadastro.html')
+    fica_em_cadastro = redirect('cadastro')
     vai_para_login = redirect('login')
 
     if request.method == 'POST':
@@ -16,29 +16,35 @@ def cadastro(request):
         ja_cadastrado = User.objects.filter(email=email).exists()
 
         if not nome.strip():
-            print('O campo nome deve ser preenchido!')
-            return volta_para_cadastro
+            messages.error(request, 'O campo nome deve ser preenchido!')
+            return fica_em_cadastro
         if not email.strip():
-            print('O campo email deve ser preenchido!')
-            return volta_para_cadastro
+            messages.error(request, 'O campo email deve ser preenchido!')
+            return fica_em_cadastro
         if senha != senha2:
-            print('A confirmação da senha deve coincidir com a senha!')
-            return volta_para_cadastro
+            messages.error(
+                request,
+                'A confirmação da senha deve coincidir com a senha!'
+            )
+            return fica_em_cadastro
         if ja_cadastrado:
-            print('Usuário já cadastrado, favor fazer o login')
+            messages.warning(
+                request,
+                'Usuário já cadastrado, favor fazer o login.'
+            )
             return vai_para_login
 
         user = User.objects.create_user(username=nome, email=email, password=senha)
         user.save()
-        print('Usuário cadastrado com sucesso!')
-        print(nome, email, senha, senha2)
+
+        messages.success(request, 'Usuário cadastrado com sucesso!')
         return vai_para_login
 
-    return volta_para_cadastro
+    return render(request, 'usuarios/cadastro.html')
 
 
 def login(request):
-    fica_em_login = render(request, 'usuarios/login.html')
+    fica_em_login = redirect('login')
     vai_para_dashboard = redirect('dashboard')
 
     if request.method == 'POST':
@@ -46,7 +52,10 @@ def login(request):
         senha = request.POST['senha']
 
         if email.strip() == '' or senha.strip() == '':
-            print('Os campos e-mail e senha são obrigatórios.')
+            messages.error(
+                request,
+                'Os campos e-mail e senha são obrigatórios!'
+            )
             return fica_em_login
 
         if User.objects.filter(email=email).exists():
@@ -65,7 +74,12 @@ def login(request):
                 print(user)
                 return vai_para_dashboard
 
-    return fica_em_login
+        messages.error(
+            request,
+            'Usuário não encontrado, favor verifique o e-mail informado.'
+        )
+
+    return render(request, 'usuarios/login.html')
 
 
 def dashboard(request):

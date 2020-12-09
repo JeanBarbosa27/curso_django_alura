@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from receitas.models import Receita
 
+# TODO: Separar lógicas em use cases e services, conforme escopo
 
 def cadastro(request):
     fica_em_cadastro = redirect('cadastro')
@@ -13,21 +14,27 @@ def cadastro(request):
         email = request.POST['email']
         senha = request.POST['password']
         senha2 = request.POST['password2']
-        ja_cadastrado = User.objects.filter(email=email).exists()
 
-        if not nome.strip():
+
+        if campo_vazio(nome):
             messages.error(request, 'O campo nome deve ser preenchido!')
             return fica_em_cadastro
-        if not email.strip():
+        if campo_vazio(nome):
             messages.error(request, 'O campo email deve ser preenchido!')
             return fica_em_cadastro
-        if senha != senha2:
+        if senhas_nao_sao_iguais(senha, senha2):
             messages.error(
                 request,
                 'A confirmação da senha deve coincidir com a senha!'
             )
             return fica_em_cadastro
-        if ja_cadastrado:
+        if email_ja_cadastrado(email):
+            messages.warning(
+                request,
+                'Usuário já cadastrado, favor fazer o login.'
+            )
+            return vai_para_login
+        if nome_ja_cadastrado(nome):
             messages.warning(
                 request,
                 'Usuário já cadastrado, favor fazer o login.'
@@ -51,14 +58,14 @@ def login(request):
         email = request.POST['email']
         senha = request.POST['senha']
 
-        if email.strip() == '' or senha.strip() == '':
+        if campo_vazio(email) or campo_vazio(senha):
             messages.error(
                 request,
                 'Os campos e-mail e senha são obrigatórios!'
             )
             return fica_em_login
 
-        if User.objects.filter(email=email).exists():
+        if email_ja_cadastrado(email):
             nome_usuario = User.objects.filter(
                 email=email
             ).values_list('username', flat=True).get()
@@ -126,3 +133,19 @@ def cria_receita(request):
         return redirect('dashboard')
 
     return render(request, 'usuarios/cria_receita.html')
+
+
+def campo_vazio(campo):
+    return not campo.strip()
+
+
+def senhas_nao_sao_iguais(senha, senha2):
+    return senha != senha2
+
+
+def email_ja_cadastrado(email):
+    return User.objects.filter(email=email).exists()
+
+
+def nome_ja_cadastrado(nome):
+    return User.objects.filter(username=nome).exists()

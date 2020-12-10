@@ -1,13 +1,17 @@
-from alura_receita.settings import ITEMS_PER_PAGE
+"""Controla o cadastro, login e logout do usuário e exibe a página de dashboard"""
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from receitas.models import Receita
 from django.core.paginator import Paginator, PageNotAnInteger, Page
+from alura_receita.settings import ITEMS_PER_PAGE
 
 # TODO: Separar lógicas em use cases e services, conforme escopo
 
 def cadastro(request):
+    """Realiza o cadastro de um novo usuário na aplicação"""
+
     fica_em_cadastro = redirect('cadastro')
     vai_para_login = redirect('login')
 
@@ -53,6 +57,8 @@ def cadastro(request):
 
 
 def login(request):
+    """Realiza o login de um usuário que já está cadastrado na aplicação"""
+
     fica_em_login = redirect('login')
     vai_para_dashboard = redirect('dashboard')
 
@@ -92,9 +98,13 @@ def login(request):
 
 
 def dashboard(request):
+    """Exibe as receitas cadastradas pelo usuário com paginação"""
+
     if request.user.is_authenticated:
         user_id = request.user.id
         receitas = Receita.objects.order_by('-data_receita').filter(pessoa=user_id)
+
+        #TODO: O paginador poderia ser um serviço, já que está sendo usado em receitas também
         paginador = Paginator(receitas, ITEMS_PER_PAGE)
         pagina = request.GET.get('page')
         receitas_paginadas = paginador.get_page(pagina)
@@ -108,21 +118,31 @@ def dashboard(request):
 
 
 def logout(request):
+    """Realiza o logout do usuário logado na aplicação"""
+
     auth.logout(request)
     return redirect('index')
 
 
 def campo_vazio(campo):
+    """Retorna verdadeiro caso o campo esteja vazio"""
+
     return not campo.strip()
 
 
 def senhas_nao_sao_iguais(senha, senha2):
+    """Retorna verdadeiro, caso a senha seja diferente da confirmação de senha"""
+
     return senha != senha2
 
 
 def email_ja_cadastrado(email):
+    """Retorna verdadeiro caso já exista usuário cadastrado com o email informado"""
+
     return User.objects.filter(email=email).exists()
 
 
 def nome_ja_cadastrado(nome):
+    """Retorna verdadeiro caso já exista usuário cadastrado com o nome informado"""
+
     return User.objects.filter(username=nome).exists()

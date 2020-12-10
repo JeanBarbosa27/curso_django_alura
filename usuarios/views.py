@@ -132,7 +132,7 @@ def cria_receita(request):
         receita.save()
         return redirect('dashboard')
 
-    return render(request, 'usuarios/cria_receita.html')
+    return render(request, 'receitas/cria_receita.html')
 
 
 def deleta_receita(request, receita_id):
@@ -144,7 +144,7 @@ def deleta_receita(request, receita_id):
 def edita_receita(request, receita_id):
     objeto_receita = get_object_or_404(Receita, pk=receita_id)
     receita = { 'receita': objeto_receita }
-    return render(request, 'usuarios/edita_receita.html', receita)
+    return render(request, 'receitas/edita_receita.html', receita)
 
 def atualiza_receita(request):
     if request.method == 'POST':

@@ -1,4 +1,9 @@
 {% load static %}
+{% url 'index' as url_inicio %}
+{% url 'dashboard' as url_dashboard %}
+{% url 'cria_receita' as url_cria_receita %}
+{% url 'login' as url_login %}
+{% url 'cadastro' as url_cadastro %}
 
 <!-- ##### Header Area Start ##### -->
 <header class="header-area">
@@ -60,28 +65,29 @@
                         <div class="classynav">
                             <ul>
                             {% if user.is_authenticated %}
-                            <li>
+                            <li class="nav-item {% if request.path == url_inicio %}active{% endif %}">
                                 <a href="{% url 'index' %}">Início</a>
                             </li>
-                            <li>
+
+                            <li class="nav-item {% if request.path == url_dashboard %}active{% endif %}">
                                 <a href="{% url 'dashboard' %}">Minhas receitas</a>
                             </li>
-                            <li>
+                            <li class="nav-item {% if request.path == url_cria_receita %}active{% endif %}">
                                 <a href="{% url 'cria_receita' %}">Criar receita</a>
                             </li>
                             {% if user.is_superuser %}
                             <li>
-                                <a href="{% url 'admin:index' %}">Admin</a>
+                                <a href="{% url 'admin:index' %}" target="_blank">Admin</a>
                             </li>
                             {% endif %}
                             <li>
                                 <a href="{% url 'logout' %}">Logout</a>
                             </li>
                             {% else %}
-                            <li>
+                            <li class="nav-item {% if request.path == url_cadastro %}active{% endif %}">
                                 <a href="{% url 'cadastro' %}">Cadastro</a>
                             </li>
-                            <li>
+                            <li class="nav-item {% if request.path == url_login %}active{% endif %}">
                                 <a href="{% url 'login' %}">Login</a>
                             </li>
                             {% endif %}

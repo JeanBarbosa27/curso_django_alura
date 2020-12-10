@@ -140,3 +140,6 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
 }
+
+#Paginator
+ITEMS_PER_PAGE = 3

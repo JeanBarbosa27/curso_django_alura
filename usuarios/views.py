@@ -1,7 +1,9 @@
+from alura_receita.settings import ITEMS_PER_PAGE
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import auth, messages
 from receitas.models import Receita
+from django.core.paginator import Paginator, PageNotAnInteger, Page
 
 # TODO: Separar lógicas em use cases e services, conforme escopo
 
@@ -93,9 +95,12 @@ def dashboard(request):
     if request.user.is_authenticated:
         user_id = request.user.id
         receitas = Receita.objects.order_by('-data_receita').filter(pessoa=user_id)
+        paginador = Paginator(receitas, ITEMS_PER_PAGE)
+        pagina = request.GET.get('page')
+        receitas_paginadas = paginador.get_page(pagina)
 
         dados = {
-            'receitas': receitas
+            'receitas': receitas_paginadas
         }
         return render(request, 'usuarios/dashboard.html', dados)
 
@@ -105,8 +110,6 @@ def dashboard(request):
 def logout(request):
     auth.logout(request)
     return redirect('index')
-
-
 
 
 def campo_vazio(campo):

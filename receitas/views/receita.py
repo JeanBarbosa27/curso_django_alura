@@ -1,7 +1,7 @@
 '''
 Controls the list of receipts and the receipt page views
 '''
-
+from alura_receita.settings import ITEMS_PER_PAGE
 from django.shortcuts import render, redirect, get_object_or_404
 from receitas.models import Receita
 from django.contrib.auth.models import User
@@ -15,7 +15,7 @@ def index(request):
     '''
 
     receitas = Receita.objects.order_by('-data_receita').filter(publicada=True)
-    paginador = Paginator(receitas, 3)
+    paginador = Paginator(receitas, ITEMS_PER_PAGE)
     pagina = request.GET.get('page')
     receitas_paginadas = paginador.get_page(pagina)
 
